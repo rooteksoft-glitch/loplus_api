@@ -7,9 +7,13 @@ import 'package:shelf_static/shelf_static.dart';
 
 void main() async {
   final router = Router();
+
+  // Route d'accueil
   router.get('/', (Request request) {
     return Response.ok('API LoPlus en ligne');
   });
+
+  // Route API pour les images
   router.get('/api/images', (Request request) {
     final baseUrl =
         Platform.environment['RENDER_EXTERNAL_URL'] ?? 'http://localhost:8080';
@@ -31,21 +35,19 @@ void main() async {
     ];
     return Response.ok(
       jsonEncode(images),
-      headers: {'Content-Type': 'appliaction/json'},
+      headers: {'Content-Type': 'application/json'}, // correction ici
     );
   });
-  final imageHandler = createStaticHandler('images');
-  final cascade = Cascade().add((Request request) {
-    if (request.url.path.startsWith('images/')) {
-      final newRequest = request.change(
-        path: request.url.path.replaceFirst('images', ''),
-      );
-      return imageHandler(newRequest);
-    }
-    return router(request);
-  });
 
+  // Gestion des fichiers statiques (images)
+  final imageHandler = createStaticHandler('images');
+
+  // Cascade : d'abord les fichiers statiques, puis les routes
+  final cascade = Cascade().add(imageHandler).add(router);
+
+  // Port fourni par Render
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
   final server = await io.serve(cascade.handler, InternetAddress.anyIPv4, port);
+
   print('Serveur démarré sur le port ${server.port}');
 }
