@@ -43,7 +43,9 @@ void main() async {
   final imageHandler = createStaticHandler('images');
 
   // Cascade : d'abord les fichiers statiques, puis les routes
-  final cascade = Cascade().add(imageHandler).add(router);
+  final cascade = Cascade()
+      .add(imageHandler)
+      .add(router);
 
   // Port fourni par Render
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
