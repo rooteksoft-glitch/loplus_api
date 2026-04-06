@@ -1,17 +1,13 @@
-# Utiliser l'image officielle Dart
-FROM dart:stable
-
-# Créer un répertoire de travail
+FROM dart:stable AS build
 WORKDIR /app
-
-# Copier les fichiers du projet
-COPY . .
-
-# Récupérer les dépendances
+COPY pubspec.* ./
 RUN dart pub get
+COPY . .
+RUN dart compile exe bin/server.dart -o bin/server
 
-# Exposer le port utilisé par Render
+FROM dart:stable AS runtime
+WORKDIR /app
+COPY --from=build /app/bin/server /app/bin/server
+COPY --from=build /app/images /app/images  
 EXPOSE 8080
-
-# Commande de démarrage
-CMD ["dart", "run", "bin/server.dart", "--port=8080"]
+CMD ["./bin/server"]
