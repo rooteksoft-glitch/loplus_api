@@ -10,4 +10,6 @@ WORKDIR /app
 COPY --from=build /app/bin/server /app/bin/server
 COPY --from=build /app/images /app/images  
 EXPOSE 8080
-CMD ["./bin/server"]
+
+# Commande de démarrage
+CMD ["dart", "run", "bin/server.dart", "--port=8080"]
